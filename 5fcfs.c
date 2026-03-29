@@ -1,0 +1,41 @@
+#include <stdio.h>
+int main()
+{
+    int n, at[50], bt[50];
+    int t = 0;
+    float wt = 0;
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++)
+    {
+        printf("\nP%d\n", i + 1);
+        printf("Arrival Time: ");
+        scanf("%d", &at[i]);
+        printf("Burst Time: ");
+        scanf("%d", &bt[i]);
+    }
+    for (int i = 0; i < n - 1; i++)
+    {
+        for (int j = i + 1; j < n; j++)
+        {
+            if (at[i] > at[j])
+            {
+                int temp = at[i];
+                at[i] = at[j];
+                at[j] = temp;
+                temp = bt[i];
+                bt[i] = bt[j];
+                bt[j] = temp;
+            }
+        }
+    }
+    for (int i = 0; i < n; i++)
+    {
+        if (t < at[i])
+            t = at[i];
+        wt += t - at[i];
+        t += bt[i];
+    }
+    printf("\nAverage Waiting Time = %.2f\n", wt / n);
+    return 0;
+}
