@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define N 10
+#define MAX 5000
+int main(int c, char *v[])
+{
+    if (c != 2) return printf("Usage: %s <head>\n", v[0]);
+    int h = atoi(v[1]), r[N], vstd[N] = {0}, t = 0;
+    srand(time(0));
+    printf("Head: %d\nReq: ", h);
+    for (int i = 0; i < N; i++)
+        printf("%d ", r[i] = rand() % MAX);
+    for (int i = 0; i < N; i++)
+    {
+        int m = 10000, k = 0;
+        for (int j = 0; j < N; j++)
+            if (!vstd[j] && abs(h - r[j]) < m)
+                m = abs(h - r[j]), k = j;
+        vstd[k] = 1;
+        t += m;
+        h = r[k];
+    }
+    printf("\nMovement: %d\n", t);
+}
