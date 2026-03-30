@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Usage: %s <length> <frames>\n", argv[0]);
+        return 0;
+    }
+    int n = atoi(argv[1]);
+    int f = atoi(argv[2]);
+    int ref[n], frame[f], last_used[f];
+    int faults = 0, counter = 0;
+    for (int i = 0; i < f; i++) {
+        frame[i] = -1;
+        last_used[i] = 0;
+    }
+    srand(time(0));
+    printf("Reference String: ");
+    for (int i = 0; i < n; i++) {
+        ref[i] = rand() % 10;
+        printf("%d ", ref[i]);
+    }
+    for (int i = 0; i < n; i++) {
+        int found = -1;
+        for (int j = 0; j < f; j++) {
+            if (frame[j] == ref[i]) {
+                found = j;
+                break;
+            }
+        }
+        if (found != -1) {
+            last_used[found] = ++counter;
+        } else {
+            int min_index = 0;
+            for (int j = 1; j < f; j++) {
+                if (last_used[j] < last_used[min_index]) {
+                    min_index = j;
+                }
+            }
+            frame[min_index] = ref[i];
+            last_used[min_index] = ++counter;
+            faults++;
+        }
+    }
+    printf("\nTotal LRU Faults: %d\n", faults);
+    return 0;
+}
