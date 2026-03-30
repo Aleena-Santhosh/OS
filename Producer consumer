@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+
+#define B 5
+#define N 3
+#define P 2
+#define C 2
+
+int buf[B], in = 0, out = 0;
+sem_t e, f, m;
+
+void* prod(void* a)
+{
+    int id = *(int*)a;
+    for (int i = 0; i < N; i++)
+    {
+        sem_wait(&e); sem_wait(&m);
+        buf[in] = i;
+        printf("P%d -> %d\n", id, i);
+        in = (in + 1) % B;
+        sem_post(&m); sem_post(&f);
+    }
+}
+
+void* cons(void* a)
+{
+    int id = *(int*)a;
+    for (int i = 0; i < (N*P)/C; i++)
+    {
+        sem_wait(&f); sem_wait(&m);
+        int x = buf[out];
+        printf("C%d <- %d\n", id, x);
+        out = (out + 1) % B;
+        sem_post(&m); sem_post(&e);
+    }
+}
+
+int main()
+{
+    pthread_t p[P], c[C];
+    int pid[P] = {1,2}, cid[C] = {1,2};
+
+    sem_init(&e,0,B); sem_init(&f,0,0); sem_init(&m,0,1);
+
+    for(int i=0;i<P;i++) pthread_create(&p[i],0,prod,&pid[i]);
+    for(int i=0;i<C;i++) pthread_create(&c[i],0,cons,&cid[i]);
+
+    for(int i=0;i<P;i++) pthread_join(p[i],0);
+    for(int i=0;i<C;i++) pthread_join(c[i],0);
+
+    printf("Done\n");
+}
